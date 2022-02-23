@@ -1,0 +1,77 @@
+//https://teachablemachine.withgoogle.com/models/1ePBD1jfV/
+
+Webcam.set({
+    width:350,
+    height:300,
+    image_format:"png",
+    png_quality: 90
+});
+
+camera = document.getElementById("camera");
+
+Webcam.attach("#camera");
+
+function takesnapshot(){
+Webcam.snap(function(data_uri) {
+    document.getElementById("Result").innerHTML = '<img id="captured_image" src="'+data_uri+'"/>';
+});
+}
+
+console.log('ml5 version:', ml5.version);
+classifier = ml5.imageClassifier('https://teachablemachine.withgoogle.com/models/1ePBD1jfV/model.json', modelLoaded);
+function modelLoaded() {
+    console.log('Model is doing a ok sign!');
+}
+
+function speak(){
+    var synth = window.speechSynthesis;
+    speak_data_1 = "The first guess is " + prediction_1;
+    speak_data_2 = "And the second prediction is " + prediction_2;
+    var utterThis = new SpeechSynthesisUtterance(speak_data_1 + speak_data_2);
+    synth.speak(utterThis);
+}
+
+
+function check(){
+    img = document.getElementById("captured_image");
+    classifier.classify(img,gotResults);
+}
+
+function gotResults(error,results){
+    if(error){
+        console.error(error);
+    }
+    else{
+        console.log(results);
+        document.getElementById("prediction1name").innerHTML = results[0].label;
+        document.getElementById("prediction2name").innerHTML = results[1].label;
+        prediction_1 = results[0].label;
+        prediction_2 = results[1].label;
+        speak();
+        if (results[0].label == "Happy"){
+            document.getElementById("emoji1").innerHTML = "&#128515;"
+        }
+        if (results[0].label == "Sad"){
+            document.getElementById("emoji1").innerHTML = "&#128577;"
+        }
+        if (results[0].label == "Thinking"){
+            document.getElementById("emoji1").innerHTML = "&#129300;"
+        }
+
+
+        if (results[1].label == "Happy"){
+            document.getElementById("emoji2").innerHTML = "&#128515;"
+        }
+
+        if (results[1].label == "Sad"){
+            document.getElementById("emoji2").innerHTML = "&#128577;"
+        }
+
+        if (results[1].label == "Thinking"){
+            document.getElementById("emoji2").innerHTML = "&#129300;"
+        }
+    }
+}
+
+
+
